@@ -20,7 +20,7 @@ class AuthController extends Controller
         return $request->validate(
             [
                 'username' => 'required|min:3|max:30',
-                'password' => 'required' // |min:3|max:32|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/
+                'password' => 'required' // |min:3|max:32|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/'
             ],
             [
                 'username.required' => 'O usuário é obrigatório',
@@ -35,7 +35,7 @@ class AuthController extends Controller
         );
     }
 
-    public function authenticate(Request $request)
+    public function authenticate(Request $request): RedirectResponse
     {
         $credentials = $this->_validate($request);
 
@@ -49,11 +49,11 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return back()->withInput()->with(['invalid_login' => 'Usuário não encontrado']);
+            return back()->withInput()->with(['invalid_login' => 'Login inválido']);
         }
 
         if (!password_verify($credentials['password'], $user->password)) {
-            return back()->withInput()->with(['invalid_login' => 'Senha Incorreta']);
+            return back()->withInput()->with(['invalid_login' => 'Login inválido']);
         }
 
         $user->update([
@@ -65,5 +65,12 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->intended(route('home'));
+    }
+
+    public function logout(): RedirectResponse
+    {
+        Auth::logout();
+
+        return redirect()->to('login');
     }
 }
