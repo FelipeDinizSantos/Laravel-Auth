@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
-class User extends Model
+class User extends AuthUser
 {
     use SoftDeletes, HasFactory;
 
@@ -24,5 +25,9 @@ class User extends Model
     protected $hidden = [
         'password',
         'token'
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
     ];
 }
